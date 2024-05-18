@@ -222,7 +222,6 @@ public class SecurityTokenReference {
             skiCrypto = new Merlin();
         }
         byte[] data = skiCrypto.getSKIBytesFromCert(cert);
-
         Text text = doc.createTextNode(org.apache.xml.security.utils.XMLUtils.encodeToString(data));
         createKeyIdentifier(doc, SKI_URI, text, true);
     }

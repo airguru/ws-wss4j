@@ -569,7 +569,7 @@ public class EncryptedKeyProcessor implements Processor {
 
         if (WSConstants.SIG_NS.equals(keyInfoChildElement.getNamespaceURI())
             && WSConstants.X509_DATA_LN.equals(keyInfoChildElement.getLocalName())) {
-            data.getBSPEnforcer().handleBSPRule(BSPRule.R5426);
+            //data.getBSPEnforcer().handleBSPRule(BSPRule.R5426);
 
             Element x509Child = getFirstElement(keyInfoChildElement);
 
@@ -595,6 +595,14 @@ public class EncryptedKeyProcessor implements Processor {
                             WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, e, "parseError"
                         );
                     }
+                } else if (WSConstants.X509_SKI.equals(x509Child.getLocalName())) {
+                    byte[] ski = EncryptionUtils.getDecodedBase64EncodedData(x509Child);
+                    if (ski == null || ski.length == 0) {
+                        throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalid X509SKI data");
+                    }
+                    CryptoType cryptoType = new CryptoType(CryptoType.TYPE.SKI_BYTES);
+                    cryptoType.setBytes(ski);
+                    return data.getDecCrypto().getX509Certificates(cryptoType);
                 }
             }
         }

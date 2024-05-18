@@ -19,10 +19,12 @@
 
 package org.apache.wss4j.common.token;
 
+import java.security.cert.X509Certificate;
 import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.DOM2Writer;
 import org.apache.wss4j.common.util.XMLUtils;
+import org.apache.wss4j.common.crypto.Crypto;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -56,6 +58,14 @@ public final class DOMX509Data {
             doc.createElementNS(WSS4JConstants.SIG_NS, "ds:X509Data");
 
         element.appendChild(domIssuerSerial.getElement());
+    }
+
+    public DOMX509Data(Document doc, X509Certificate cert, Crypto crypto) throws WSSecurityException {
+        element = doc.createElementNS(WSS4JConstants.SIG_NS, "ds:X509Data");
+        String base64SKI = org.apache.xml.security.utils.XMLUtils.encodeToString(crypto.getSKIBytesFromCert(cert));
+        Element skiElement = doc.createElementNS(WSS4JConstants.SIG_NS, "ds:X509SKI");
+        skiElement.appendChild(doc.createTextNode(base64SKI));
+        element.appendChild(skiElement);
     }
 
     /**

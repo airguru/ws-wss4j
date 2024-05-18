@@ -361,7 +361,7 @@ public class WSSecEncryptedKey extends WSSecBase {
                     secToken.addTokenType(WSConstants.WSS_ENC_KEY_VALUE_TYPE);
                 }
                 break;
-
+            
             default:
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "unsupportedKeyId",
                                               new Object[] {keyIdentifierType});
@@ -376,7 +376,9 @@ public class WSSecEncryptedKey extends WSSecBase {
             if (WSConstants.AGREEMENT_METHOD_ECDH_ES.equals(keyAgreementMethod)) {
                 try {
                     AgreementMethodImpl agreementMethod = new AgreementMethodImpl(getDocument(), dhSpec);
-                    agreementMethod.getRecipientKeyInfo().addUnknownElement(secToken.getElement());
+                    agreementMethod.getRecipientKeyInfo().addUnknownElement(
+                        new DOMX509Data(getDocument(), remoteCert, crypto).getElement()
+                    );
                     Element agreementMethodElement = agreementMethod.getElement();
                     keyInfoElement.appendChild(agreementMethodElement);
                 } catch (XMLSecurityException e) {
